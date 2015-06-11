@@ -14,16 +14,17 @@ bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
         pose.position.x = 4.5;
         pose.position.y = 7.3;
         pose.position.z = 0;
-        pose.orientation.w = 3.8;
+        pose.orientation.z = -1.0; //tf::createQuaternionMsgFromYaw(3.141596);
         return true;
 
     } else if (area == "livingroom_table") {
         printf("Request to put robot at livingroom_table.\n");
 
-        pose.position.x = 7.4;
-        pose.position.y = 7.6;
+        pose.position.x = 6.8;
+        pose.position.y = 7.3;
         pose.position.z = 0;
-        pose.orientation.w = 3 * 3.141596 / 2;
+        pose.orientation.w = 0.7;
+        pose.orientation.z = -0.7; //tf::createQuaternionMsgFromYaw(3.141596 / 2);
         return true;
 
     } else {
@@ -75,7 +76,7 @@ bool goTo(house_action_performer::AreaName::Request &req,
     if (getAreaPose(req.area, goal.target_pose.pose)) {
 
         //we'll send a goal to the robot to move 1 meter forward
-        goal.target_pose.header.frame_id = "base_link";
+        goal.target_pose.header.frame_id = "map";
         goal.target_pose.header.stamp = ros::Time::now();
 
         ROS_INFO("Sending goal");
