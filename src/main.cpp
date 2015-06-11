@@ -26,6 +26,15 @@ bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
         pose.orientation.w = 0.7;
         pose.orientation.z = -0.7; //tf::createQuaternionMsgFromYaw(3.141596 / 2);
         return true;
+    } else if (area == "kitchen_table") {
+        printf("Request to put robot at test.\n");
+
+        pose.position.x = 7.4;
+        pose.position.y = 8.3;
+        pose.position.z = 0;
+        pose.orientation.w = 0.7;
+        pose.orientation.z = -0.7; //tf::createQuaternionMsgFromYaw(3.141596 / 2);
+        return true;
 
     } else {
         printf("Unknown furniture: %s", area.c_str());
@@ -117,10 +126,10 @@ int main(int argc, char** argv) {
     //ros::ServiceServer serviceExplore = node.advertiseService("house_action_performer/explore", explore);
     //ROS_INFO("[Request] Ready to explore!");
 
-    
+
     // Set this in a ros service?
     ros::Rate loop_rate(30);
-    
+
     while (node.ok()) {
         ros::spinOnce();
         loop_rate.sleep();
