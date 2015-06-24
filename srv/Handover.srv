@@ -1,0 +1,4 @@
+string objectName
+string agentName
+---
+bool answer

@@ -2,10 +2,19 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 
-#include "house_action_performer/AreaName.h"
+#include "openprs/opaque-pub.h"
+#include "openprs/mp-pub.h"
+
+#include "house_action_performer/Name.h"
+#include "house_action_performer/Empty.h"
+#include "house_action_performer/Place.h"
+#include "house_action_performer/Handover.h"
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 MoveBaseClient* mvClient_;
+
+int mpSocket_ = -1;
+std::string oprsDest_ = "OPRS_SUP";
 
 bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
     if (area == "livingroom_coffeetable") {
@@ -77,12 +86,12 @@ bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
 //////////////////////////
 //Services
 
-bool goTo(house_action_performer::AreaName::Request &req,
-        house_action_performer::AreaName::Response & res) {
+bool goTo(house_action_performer::Name::Request &req,
+        house_action_performer::Name::Response & res) {
 
     move_base_msgs::MoveBaseGoal goal;
 
-    if (getAreaPose(req.area, goal.target_pose.pose)) {
+    if (getAreaPose(req.name, goal.target_pose.pose)) {
 
         //we'll send a goal to the robot to move 1 meter forward
         goal.target_pose.header.frame_id = "map";
@@ -93,10 +102,10 @@ bool goTo(house_action_performer::AreaName::Request &req,
         mvClient_->waitForResult();
 
         if (mvClient_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
-            ROS_INFO("Hooray, the base moved to %s", req.area.c_str());
+            ROS_INFO("Hooray, the base moved to %s", req.name.c_str());
             res.answer = true;
         } else {
-            ROS_INFO("The base failed to move to %s for some reason", req.area.c_str());
+            ROS_INFO("The base failed to move to %s for some reason", req.name.c_str());
             res.answer = false;
         }
         return true;
@@ -104,6 +113,87 @@ bool goTo(house_action_performer::AreaName::Request &req,
         res.answer = false;
         return false;
     }
+}
+
+bool explore(house_action_performer::Empty::Request &req,
+        house_action_performer::Empty::Response & res) {
+
+    //send a message to oprs
+    std::string strmessage = "(requestMananager.request explore (. .) house_action_performer)";
+    char returnMessage[50];
+    strcpy(returnMessage, strmessage.c_str());
+    send_message_string(returnMessage, oprsDest_.c_str());
+
+
+    //read the openprs message
+    int length;
+    char *sender = read_string_from_socket(mpSocket_, &length);
+    char *message = read_string_from_socket(mpSocket_, &length);
+
+
+    return true;
+}
+
+bool pick(house_action_performer::Name::Request &req,
+        house_action_performer::Name::Response & res) {
+
+    //send a message to oprs
+    std::stringstream ss;
+    ss << "(requestMananager.request pick (. " << req.name << " .) house_action_performer)";
+
+    char returnMessage[50];
+    strcpy(returnMessage, ss.str().c_str());
+    send_message_string(returnMessage, oprsDest_.c_str());
+
+
+    //read the openprs message
+    int length;
+    char *sender = read_string_from_socket(mpSocket_, &length);
+    char *message = read_string_from_socket(mpSocket_, &length);
+
+    res.answer = true;
+
+    return true;
+}
+
+bool place(house_action_performer::Place::Request &req,
+        house_action_performer::Place::Response & res) {
+
+    //send a message to oprs
+    std::stringstream ss;
+    ss << "(requestMananager.request pick (. " << req.furnitureName << " " << req.objectName << " .) house_action_performer)";
+    char returnMessage[50];
+    strcpy(returnMessage, ss.str().c_str());
+    send_message_string(returnMessage, oprsDest_.c_str());
+
+
+    //read the openprs message
+    int length;
+    char *sender = read_string_from_socket(mpSocket_, &length);
+    char *message = read_string_from_socket(mpSocket_, &length);
+
+
+    return true;
+}
+
+bool handover(house_action_performer::Handover::Request &req,
+        house_action_performer::Handover::Response & res) {
+
+    //send a message to oprs
+    std::stringstream ss;
+    ss << "(requestMananager.request pick (. " << req.agentName << " " << req.objectName << " .) house_action_performer)";
+    char returnMessage[50];
+    strcpy(returnMessage, ss.str().c_str());
+    send_message_string(returnMessage, oprsDest_.c_str());
+
+
+    //read the openprs message
+    int length;
+    char *sender = read_string_from_socket(mpSocket_, &length);
+    char *message = read_string_from_socket(mpSocket_, &length);
+
+
+    return true;
 }
 
 int main(int argc, char** argv) {
@@ -123,9 +213,28 @@ int main(int argc, char** argv) {
     ros::ServiceServer serviceGoTo = node.advertiseService("house_action_performer/go_to", goTo);
     ROS_INFO("[Request] Ready to go!");
 
+    ros::ServiceServer serviceExplore = node.advertiseService("house_action_performer/explore", explore);
+    ROS_INFO("[Request] Ready to explore!");
+
+    ros::ServiceServer servicePick = node.advertiseService("house_action_performer/pick", pick);
+    ROS_INFO("[Request] Ready to pick!");
+
+    ros::ServiceServer servicePlace = node.advertiseService("house_action_performer/place", place);
+    ROS_INFO("[Request] Ready to place!");
+
+    ros::ServiceServer serviceHandover = node.advertiseService("house_action_performer/give", handover);
+    ROS_INFO("[Request] Ready to give!");
+
     //ros::ServiceServer serviceExplore = node.advertiseService("house_action_performer/explore", explore);
     //ROS_INFO("[Request] Ready to explore!");
 
+
+    while (mpSocket_ == -1) {
+        mpSocket_ = external_register_to_the_mp_prot("house_action_performer", 3300, STRINGS_PT);
+        printf("Waiting For oprs ...");
+    }
+
+    printf("Successfully connected to oprs :)");
 
     // Set this in a ros service?
     ros::Rate loop_rate(30);

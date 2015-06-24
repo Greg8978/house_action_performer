@@ -57,7 +57,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
-   AreaName.srv
+   Name.srv
+   Empty.srv
+   Place.srv
+   Handover.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -100,6 +103,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  $ENV{ROBOTPKG_BASE}/include
 )
 
 ## Declare a cpp library
@@ -117,6 +121,7 @@ add_dependencies(house_action_performer house_action_performer_generate_messages
 ## Specify libraries to link a library or executable target against
 target_link_libraries(house_action_performer
  ${catkin_LIBRARIES}
+ $ENV{ROBOTPKG_BASE}/lib/libExtMP.a
 )
 
 #############

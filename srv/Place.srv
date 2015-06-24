@@ -1,0 +1,4 @@
+string objectName
+string furnitureName
+---
+bool answer
