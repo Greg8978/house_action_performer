@@ -9,6 +9,7 @@
 #include "house_action_performer/Empty.h"
 #include "house_action_performer/Place.h"
 #include "house_action_performer/Handover.h"
+#include "house_action_performer/Goal.h"
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 MoveBaseClient* mvClient_;
@@ -36,13 +37,13 @@ bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
         pose.orientation.z = -0.7; //tf::createQuaternionMsgFromYaw(3.141596 / 2);
         return true;
     } else if (area == "kitchen_table") {
-        printf("Request to put robot at test.\n");
+        printf("Request to put robot at kitchen_table.\n");
 
-        pose.position.x = 7.4;
-        pose.position.y = 8.3;
+        pose.position.x = 7.7;
+        pose.position.y = 9.8;
         pose.position.z = 0;
-        pose.orientation.w = 0.7;
-        pose.orientation.z = -0.7; //tf::createQuaternionMsgFromYaw(3.141596 / 2);
+        pose.orientation.w = 1.0;
+        pose.orientation.z = 0.0; //tf::createQuaternionMsgFromYaw(3.141596 / 2);
         return true;
 
     } else {
@@ -196,6 +197,28 @@ bool handover(house_action_performer::Handover::Request &req,
     return true;
 }
 
+bool sendGoal(house_action_performer::Goal::Request &req,
+        house_action_performer::Goal::Response & res) {
+
+    //send a message to oprs
+    printf("received request to send goal\n");
+    std::stringstream ss;
+    ss << "(requestMananager.request " << req.goal <<  " (. " << req.objectName << " " << req.locationName << " " << req.agentName << " .) house_action_performer)";
+    char returnMessage[50];
+    strcpy(returnMessage, ss.str().c_str());
+    send_message_string(returnMessage, oprsDest_.c_str());
+
+
+    //read the openprs message
+    int length;
+    char *sender = read_string_from_socket(mpSocket_, &length);
+    char *message = read_string_from_socket(mpSocket_, &length);
+
+
+    printf("request send to oprs\n");
+    return true;
+}
+
 int main(int argc, char** argv) {
     ros::init(argc, argv, "house_action_performer");
 
@@ -225,6 +248,9 @@ int main(int argc, char** argv) {
     ros::ServiceServer serviceHandover = node.advertiseService("house_action_performer/give", handover);
     ROS_INFO("[Request] Ready to give!");
 
+    ros::ServiceServer servicesendGoal = node.advertiseService("house_action_performer/send_goal", sendGoal);
+    ROS_INFO("[Request] Ready to send_goal!");
+    
     //ros::ServiceServer serviceExplore = node.advertiseService("house_action_performer/explore", explore);
     //ROS_INFO("[Request] Ready to explore!");
 

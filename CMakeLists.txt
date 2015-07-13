@@ -61,6 +61,7 @@ find_package(catkin REQUIRED COMPONENTS
    Empty.srv
    Place.srv
    Handover.srv
+   Goal.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -104,6 +105,7 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS}
   $ENV{ROBOTPKG_BASE}/include
+  $ENV{ROBOTPKG_BASE}/include/openprs
 )
 
 ## Declare a cpp library
