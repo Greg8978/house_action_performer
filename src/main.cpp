@@ -1,6 +1,4 @@
 #include <ros/ros.h>
-#include <move_base_msgs/MoveBaseAction.h>
-#include <actionlib/client/simple_action_client.h>
 
 #include "openprs/opaque-pub.h"
 #include "openprs/mp-pub.h"
@@ -11,13 +9,11 @@
 #include "house_action_performer/Handover.h"
 #include "house_action_performer/Goal.h"
 
-typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
-MoveBaseClient* mvClient_;
 
 int mpSocket_ = -1;
 std::string oprsDest_ = "OPRS_SUP";
 
-bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
+/*bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
     if (area == "livingroom_coffeetable") {
 
         printf("Request to put robot at livingroom_coffeetable.\n");
@@ -51,7 +47,7 @@ bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
         return false;
     }
 
-    /* robot_teleport.publish(x_y_z_yaw_pitch_roll)
+     robot_teleport.publish(x_y_z_yaw_pitch_roll)
    elif furniture_name == "bedroom_chest":
      print("Request to put robot at bedroom_chest.")
      x_y_z_yaw_pitch_roll = {"x": 5, "y": 11.3, "z": 0, "yaw": 0.0, "pitch": 0, "roll": 0}
@@ -82,12 +78,12 @@ bool getAreaPose(std::string area, geometry_msgs::Pose& pose) {
      robot_teleport.publish(x_y_z_yaw_pitch_roll)
    else:
      print("Unknown furniture: " + furniture_name)
-     */
-}
+     
+}*/
 //////////////////////////
 //Services
 
-bool goTo(house_action_performer::Name::Request &req,
+/*bool goTo(house_action_performer::Name::Request &req,
         house_action_performer::Name::Response & res) {
 
     move_base_msgs::MoveBaseGoal goal;
@@ -115,7 +111,7 @@ bool goTo(house_action_performer::Name::Request &req,
         return false;
     }
 }
-
+*/
 bool explore(house_action_performer::Empty::Request &req,
         house_action_performer::Empty::Response & res) {
 
@@ -162,7 +158,7 @@ bool place(house_action_performer::Place::Request &req,
 
     //send a message to oprs
     std::stringstream ss;
-    ss << "(requestMananager.request pick (. " << req.furnitureName << " " << req.objectName << " .) house_action_performer)";
+    ss << "(RequestMananager.request pick (. " << req.furnitureName << " " << req.objectName << " .) house_action_performer)";
     char returnMessage[50];
     strcpy(returnMessage, ss.str().c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
@@ -203,7 +199,7 @@ bool sendGoal(house_action_performer::Goal::Request &req,
     //send a message to oprs
     printf("received request to send goal\n");
     std::stringstream ss;
-    ss << "(requestMananager.request " << req.goal <<  " (. " << req.objectName << " " << req.locationName << " " << req.agentName << " .) house_action_performer)";
+    ss << "(RequestMananager.request " << req.goal <<  " (. " << req.areaName << " " << req.objectName << " " << req.locationName << " " << req.agentName << " .) house_action_performer)";
     char returnMessage[50];
     strcpy(returnMessage, ss.str().c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
@@ -224,17 +220,17 @@ int main(int argc, char** argv) {
 
     ros::NodeHandle node;
     //tell the action client that we want to spin a thread by default
-    MoveBaseClient ac("move_base", true);
-    mvClient_ = &ac;
+    //MoveBaseClient ac("move_base", true);
+    //mvClient_ = &ac;
 
     //wait for the action server to come up
-    while (!mvClient_->waitForServer(ros::Duration(5.0))) {
-        ROS_INFO("Waiting for the move_base action server to come up");
-    }
+//    while (!mvClient_->waitForServer(ros::Duration(5.0))) {
+  //      ROS_INFO("Waiting for the move_base action server to come up");
+   // }
 
     //Services
-    ros::ServiceServer serviceGoTo = node.advertiseService("house_action_performer/go_to", goTo);
-    ROS_INFO("[Request] Ready to go!");
+  //  ros::ServiceServer serviceGoTo = node.advertiseService("house_action_performer/go_to", goTo);
+  //  ROS_INFO("[Request] Ready to go!");
 
     ros::ServiceServer serviceExplore = node.advertiseService("house_action_performer/explore", explore);
     ROS_INFO("[Request] Ready to explore!");

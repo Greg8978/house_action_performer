@@ -5,8 +5,6 @@ project(house_action_performer)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  actionlib
-  move_base_msgs
   roscpp
   rospy
   geometry_msgs
@@ -76,7 +74,6 @@ find_package(catkin REQUIRED COMPONENTS
    DEPENDENCIES
    std_msgs
    geometry_msgs
-   move_base_msgs
  )
 
 ###################################
