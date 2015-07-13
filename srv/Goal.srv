@@ -1,0 +1,6 @@
+string objectName
+string agentName
+string locationName
+string goal
+---
+bool answer
