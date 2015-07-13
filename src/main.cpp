@@ -116,7 +116,7 @@ bool explore(house_action_performer::Empty::Request &req,
         house_action_performer::Empty::Response & res) {
 
     //send a message to oprs
-    std::string strmessage = "(requestMananager.request explore (. .) house_action_performer)";
+    std::string strmessage = "(RequestManager.request explore (. .) house_action_performer)";
     char returnMessage[50];
     strcpy(returnMessage, strmessage.c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
@@ -136,7 +136,7 @@ bool pick(house_action_performer::Name::Request &req,
 
     //send a message to oprs
     std::stringstream ss;
-    ss << "(requestMananager.request pick (. " << req.name << " .) house_action_performer)";
+    ss << "(requestManager.request pick (. " << req.name << " .) house_action_performer)";
 
     char returnMessage[50];
     strcpy(returnMessage, ss.str().c_str());
@@ -158,7 +158,7 @@ bool place(house_action_performer::Place::Request &req,
 
     //send a message to oprs
     std::stringstream ss;
-    ss << "(RequestMananager.request pick (. " << req.furnitureName << " " << req.objectName << " .) house_action_performer)";
+    ss << "(RequestManager.request pick (. " << req.furnitureName << " " << req.objectName << " .) house_action_performer)";
     char returnMessage[50];
     strcpy(returnMessage, ss.str().c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
@@ -178,7 +178,7 @@ bool handover(house_action_performer::Handover::Request &req,
 
     //send a message to oprs
     std::stringstream ss;
-    ss << "(requestMananager.request pick (. " << req.agentName << " " << req.objectName << " .) house_action_performer)";
+    ss << "(RequestManager.request pick (. " << req.agentName << " " << req.objectName << " .) house_action_performer)";
     char returnMessage[50];
     strcpy(returnMessage, ss.str().c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
@@ -199,7 +199,7 @@ bool sendGoal(house_action_performer::Goal::Request &req,
     //send a message to oprs
     printf("received request to send goal\n");
     std::stringstream ss;
-    ss << "(RequestMananager.request " << req.goal <<  " (. " << req.areaName << " " << req.objectName << " " << req.locationName << " " << req.agentName << " .) house_action_performer)";
+    ss << "(RequestManager.request " << req.goal <<  " (. " << req.areaName << " " << req.objectName << " " << req.locationName << " " << req.agentName << " .) house_action_performer)";
     char returnMessage[50];
     strcpy(returnMessage, ss.str().c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
