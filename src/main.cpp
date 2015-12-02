@@ -210,7 +210,7 @@ bool sendGoal(house_action_performer::Goal::Request &req,
     char *sender = read_string_from_socket(mpSocket_, &length);
     char *message = read_string_from_socket(mpSocket_, &length);
 
-
+    res.answer = true;
     printf("request send to oprs\n");
     return true;
 }
