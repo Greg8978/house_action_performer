@@ -200,13 +200,13 @@ bool sendGoal(house_action_performer::Goal::Request &req,
     printf("received request to send goal\n");
     std::stringstream ss;
     ss << "(RequestManager.request " << req.goal <<  " (. " << req.areaName << " " << req.objectName << " " << req.locationName << " " << req.agentName << " .) house_action_performer)";
-    char returnMessage[50];
+    char returnMessage[100];
     strcpy(returnMessage, ss.str().c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
 
 
     //read the openprs message
-    int length;
+    int length = 0;
     char *sender = read_string_from_socket(mpSocket_, &length);
     char *message = read_string_from_socket(mpSocket_, &length);
 
