@@ -55,6 +55,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
+   DialInput.srv
    Name.srv
    Empty.srv
    Place.srv

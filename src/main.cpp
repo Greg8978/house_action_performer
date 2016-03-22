@@ -8,6 +8,7 @@
 #include "house_action_performer/Place.h"
 #include "house_action_performer/Handover.h"
 #include "house_action_performer/Goal.h"
+#include "house_action_performer/DialInput.h"
 
 
 int mpSocket_ = -1;
@@ -47,6 +48,7 @@ std::string oprsDest_ = "OPRS_SUP";
         return false;
     }
 
+     // This is just to get the furniture position (from some python code)
      robot_teleport.publish(x_y_z_yaw_pitch_roll)
    elif furniture_name == "bedroom_chest":
      print("Request to put robot at bedroom_chest.")
@@ -112,14 +114,41 @@ std::string oprsDest_ = "OPRS_SUP";
     }
 }
 */
+
+bool dialIn(house_action_performer::DialInput::Request &req,
+        house_action_performer::DialInput::Response & res) {
+
+     ROS_INFO("received dialogue input: %s the %s named %s which has type %s and is on the %s in the %s to the %s in the %s", req.actionType.c_str(), req.objectType.c_str(), req.objectTitle.c_str(), req.objectCategory.c_str(), req.furnitureSubject.c_str(), req.roomSubject.c_str(), req.furnitureTarget.c_str(), req.roomTarget.c_str());
+
+    //send a message to oprs
+    /*std::string strmessage = "(RequestManager.request (. .) house_action_performer)";
+    char returnMessage[100];
+    strcpy(returnMessage, strmessage.c_str());
+    send_message_string(returnMessage, oprsDest_.c_str());
+
+
+    //read the openprs message
+    int length;
+    char *sender = read_string_from_socket(mpSocket_, &length);
+    char *message = read_string_from_socket(mpSocket_, &length);
+
+*/
+    return true;
+}
+
+
+
 bool explore(house_action_performer::Empty::Request &req,
         house_action_performer::Empty::Response & res) {
 
+
+    
     //send a message to oprs
     std::string strmessage = "(RequestManager.request explore (. .) house_action_performer)";
-    char returnMessage[50];
+    char returnMessage[100];
     strcpy(returnMessage, strmessage.c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
+
 
 
     //read the openprs message
@@ -138,7 +167,7 @@ bool pick(house_action_performer::Name::Request &req,
     std::stringstream ss;
     ss << "(requestManager.request pick (. " << req.name << " .) house_action_performer)";
 
-    char returnMessage[50];
+    char returnMessage[100];
     strcpy(returnMessage, ss.str().c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
 
@@ -179,7 +208,7 @@ bool handover(house_action_performer::Handover::Request &req,
     //send a message to oprs
     std::stringstream ss;
     ss << "(RequestManager.request pick (. " << req.agentName << " " << req.objectName << " .) house_action_performer)";
-    char returnMessage[50];
+    char returnMessage[100];
     strcpy(returnMessage, ss.str().c_str());
     send_message_string(returnMessage, oprsDest_.c_str());
 
@@ -231,6 +260,9 @@ int main(int argc, char** argv) {
     //Services
   //  ros::ServiceServer serviceGoTo = node.advertiseService("house_action_performer/go_to", goTo);
   //  ROS_INFO("[Request] Ready to go!");
+
+    ros::ServiceServer serviceDialIn = node.advertiseService("house_action_performer/dialogue", dialIn);
+    ROS_INFO("[Request] Ready to get dialogue input!");
 
     ros::ServiceServer serviceExplore = node.advertiseService("house_action_performer/explore", explore);
     ROS_INFO("[Request] Ready to explore!");

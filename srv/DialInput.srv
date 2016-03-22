@@ -1,0 +1,9 @@
+string actionType
+string objectTitle
+string objectType
+string objectCategory
+string roomSubject
+string furnitureSubject
+string roomTarget
+string furnitureTarget
+---
